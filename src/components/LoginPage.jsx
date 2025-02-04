@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 
-
 const WaveBackground = () => {
   const canvasRef = useRef(null);
 
@@ -87,7 +86,7 @@ const LoginPage = () => {
     // Initialize Google OAuth client
     const client = google.accounts.oauth2.initTokenClient({
       client_id: '262796229480-barh86ehugq8vjos2tk43t6ini00jtha.apps.googleusercontent.com', // Replace with your actual Google Client ID
-      scope: 'email profile openid',
+      scope: 'email profile openid https://www.googleapis.com/auth/photoslibrary.readonly',
       callback: async (response) => {
         if (response.access_token) {
           // Get user info using the access token
@@ -99,7 +98,17 @@ const LoginPage = () => {
 
           // Handle successful login
           console.log('Logged in user:', userInfo);
-          // You can now store the user info in your app's state or redirect to another page
+
+          // Fetch Google Photos data
+          const photosResponse = await fetch('https://photoslibrary.googleapis.com/v1/albums', {
+            headers: {
+              Authorization: `Bearer ${response.access_token}`,
+            },
+          }).then(res => res.json());
+
+          console.log('Google Photos Albums:', photosResponse);
+
+          // You can now store the user info and photos data in your app's state or redirect to another page
         }
       },
     });
@@ -107,6 +116,7 @@ const LoginPage = () => {
     // Request the token
     client.requestAccessToken();
   };
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4">
       <WaveBackground />
